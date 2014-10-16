@@ -9,6 +9,10 @@ import java.net.URI;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.webapp.WebAppClassLoader;
+import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.util.resource.JarResource;
+import java.io.File;
 
 public class EmbedWithOverridenServlet
 {
@@ -17,10 +21,16 @@ public class EmbedWithOverridenServlet
         int port = 8080;
         Server server = new Server(port);
 
-        String wardir = "../example-webapp/target/example-webapp-1-SNAPSHOT.war";
+        String jardir = "../example-webapp/target/example-webapp-1-SNAPSHOT.jar";
+        String descriptorFile = "../example-webapp/src/main/webapp/WEB-INF/web.xml";
 
         WebAppContext webapp = new WebAppContext();
-        webapp.setWar(wardir);
+        //webapp.setWar(wardir);
+        WebAppClassLoader webAppClassLoader = new WebAppClassLoader(webapp);
+        webAppClassLoader.addClassPath(jardir);
+        webapp.setClassLoader(webAppClassLoader);
+        webapp.setResourceBase(".");
+        webapp.setDescriptor(descriptorFile);
         webapp.setContextPath("/");
 
         if(Boolean.getBoolean("use.server.class"))
